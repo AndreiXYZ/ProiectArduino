@@ -22,15 +22,17 @@ int vx, vy;
 //address of MPU-6050
 const int mpuAddr=0x68;
 
+//retrieve sensor values via i2c
 void getSensorValues(){
   Wire.beginTransmission(mpuAddr);
   Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission(false);
-  Wire.requestFrom(mpuAddr,14,true);  // request a total of 14 registers
+  //each axis has a high and low register
+  Wire.requestFrom(mpuAddr,14,true);  // request a total of 7*2=14 registers
   ax=Wire.read()<<8|Wire.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)    
   ay=Wire.read()<<8|Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
   az=Wire.read()<<8|Wire.read();  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
-  temp=Wire.read()<<8|Wire.read();  // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
+  temp=Wire.read()<<8|Wire.read();  // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L), unused
   gx=Wire.read()<<8|Wire.read();  // 0x43 (GYRO_XOUT_H) & 0x44 (GYRO_XOUT_L)
   gy=Wire.read()<<8|Wire.read();  // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
   gz=Wire.read()<<8|Wire.read();  // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
@@ -56,7 +58,7 @@ void setup() {
   Mouse.begin();
   Wire.begin();
   Wire.beginTransmission(mpuAddr);
-  Wire.write(0x6B); //PWR_MGMT_1 register
+  Wire.write(0x6B); //power management register
   Wire.write(0); // wake up MPU-6050
   Wire.endTransmission(true);
   pinMode(RXLED, OUTPUT);
@@ -101,9 +103,9 @@ void loop(){
     Mouse.move(0,0,-1);
 
   //move mouse
-  vy = -(gx+300)/200;
-  vx = (gz-100)/200;
+  moveX = -(gx+300)/200;
+  moveY = (gz-100)/200;
   
-  Mouse.move(-vx, vy);
+  Mouse.move(moveX, moveY);
   delay(20);
 }
