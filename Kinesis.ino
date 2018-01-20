@@ -103,8 +103,8 @@ void loop(){
     Mouse.move(0,0,-1);
 
   //move mouse
-  moveX = -(gx+300)/200;
-  moveY = (gz-100)/200;
+  int moveX = -(gx+300)/200;
+  int moveY = (gz-100)/200;
   
   Mouse.move(moveX, moveY);
   delay(20);
